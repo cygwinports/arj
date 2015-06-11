@@ -1,20 +1,31 @@
 NAME="arj"
 VERSION=3.10.22
-RELEASE=1
+RELEASE=2
 CATEGORY="Archive"
 SUMMARY="Archiver for .arj files"
 DESCRIPTION="This package is an open source version of the arj archiver. It has
 been created with the intent to preserve maximum compatibility and retain the
 feature set of original ARJ archiver as provided by ARJ Software, Inc."
 HOMEPAGE="http://arj.sourceforge.net/"
-SRC_URI="mirror://sourceforge/arj/arj-${VERSION}.tar.gz"
+SRC_URI="
+	mirror://sourceforge/arj/arj-${VERSION}.tar.gz
+	http://pkgs.fedoraproject.org/cgit/arj.git/plain/unarj.sh
+	http://pkgs.fedoraproject.org/cgit/arj.git/plain/unarj.1
+"
 PATCH_URI="
 	http://pkgs.fedoraproject.org/cgit/arj.git/plain/arj-3.10.22-arches_align.patch
 	http://pkgs.fedoraproject.org/cgit/arj.git/plain/arj-3.10.22-no_remove_static_const.patch
 	http://pkgs.fedoraproject.org/cgit/arj.git/plain/arj-3.10.22-64_bit_clean.patch
 	http://pkgs.fedoraproject.org/cgit/arj.git/plain/arj-3.10.22-parallel_build.patch
+	http://pkgs.fedoraproject.org/cgit/arj.git/plain/arj-3.10.22-use_safe_strcpy.patch
 	http://pkgs.fedoraproject.org/cgit/arj.git/plain/arj-3.10.22-doc_refer_robert_k_jung.patch
+	http://pkgs.fedoraproject.org/cgit/arj.git/plain/arj-3.10.22-security_format.patch
+	http://pkgs.fedoraproject.org/cgit/arj.git/plain/arj-3.10.22-missing-protos.patch
 	http://pkgs.fedoraproject.org/cgit/arj.git/plain/arj-3.10.22-custom-printf.patch
+	http://pkgs.fedoraproject.org/cgit/arj.git/plain/arj-3.10.22-quotes.patch
+	http://pkgs.fedoraproject.org/cgit/arj.git/plain/arj-3.10.22-security-afl.patch
+	http://pkgs.fedoraproject.org/cgit/arj.git/plain/arj-3.10.22-security-traversal-dir.patch
+	http://pkgs.fedoraproject.org/cgit/arj.git/plain/arj-3.10.22-security-traversal-symlink.patch
 "
 
 src_compile() {
@@ -28,4 +39,17 @@ src_compile() {
 	cygmake ADD_LDFLAGS=""
 }
 
-DOCS="doc/*"
+src_install() {
+	cd ${B}
+	cyginstall
+
+	rm -f ${D}/usr/{bin,share/man/man1}/arj-register.*
+
+	insinto /etc
+	newins ${S}/resource/rearj.cfg.example rearj.cfg
+	make_etc_defaults /etc/rearj.cfg
+
+	newbin ${S}/unarj.sh unarj
+	doman ${S}/unarj.1
+	dodoc ${S}/doc/*
+}
