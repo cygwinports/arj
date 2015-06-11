@@ -1,0 +1,31 @@
+NAME="arj"
+VERSION=3.10.22
+RELEASE=1
+CATEGORY="Archive"
+SUMMARY="Archiver for .arj files"
+DESCRIPTION="This package is an open source version of the arj archiver. It has
+been created with the intent to preserve maximum compatibility and retain the
+feature set of original ARJ archiver as provided by ARJ Software, Inc."
+HOMEPAGE="http://arj.sourceforge.net/"
+SRC_URI="mirror://sourceforge/arj/arj-${VERSION}.tar.gz"
+PATCH_URI="
+	http://pkgs.fedoraproject.org/cgit/arj.git/plain/arj-3.10.22-arches_align.patch
+	http://pkgs.fedoraproject.org/cgit/arj.git/plain/arj-3.10.22-no_remove_static_const.patch
+	http://pkgs.fedoraproject.org/cgit/arj.git/plain/arj-3.10.22-64_bit_clean.patch
+	http://pkgs.fedoraproject.org/cgit/arj.git/plain/arj-3.10.22-parallel_build.patch
+	http://pkgs.fedoraproject.org/cgit/arj.git/plain/arj-3.10.22-doc_refer_robert_k_jung.patch
+	http://pkgs.fedoraproject.org/cgit/arj.git/plain/arj-3.10.22-custom-printf.patch
+"
+
+src_compile() {
+	lndirs
+	cd ${B}/gnu
+	NO_AUTOHEADER=1 \
+	cygautoreconf
+	CYGCONF_SOURCE=. \
+	cygconf
+	cd ${B}
+	cygmake ADD_LDFLAGS=""
+}
+
+DOCS="doc/*"
